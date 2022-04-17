@@ -2,8 +2,8 @@ module ExprParser where
 
 import Data.Char (isDigit, digitToInt)
 
-import           TinyMPC hiding (any, fail)
-import qualified TinyMPC as Mpc
+import           TinyMPC (Parser)
+import qualified Parsers as P
 
 data Op = Add
         | Sub
@@ -13,22 +13,17 @@ data Op = Add
 
 opParser :: Parser Op
 opParser = do
-    c <- Mpc.any
+    c <- P.any
     case c of
       '+' -> return Add
       '-' -> return Sub
       '*' -> return Mul
       '/' -> return Sub
-      _   -> Mpc.fail "not a valid operation"
+      _   -> P.fail "not a valid operation"
 
 
 digParser :: Parser Int
-digParser = Parser go
-  where
-      go ""     = Left "digParser: end of file"
-      go (c:cs) = if isDigit c
-                  then Right (digitToInt c :: Int, cs)
-                  else Left $ "digParser:" ++ [c] ++  "is not a digit"
+digParser = digitToInt <$> P.satisfy isDigit
 
 
 type Expr = (Int, Op, Int)

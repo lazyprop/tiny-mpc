@@ -2,6 +2,8 @@
 
 module TinyMPC  where
 
+import Text.Printf
+
 import Control.Applicative
 
 newtype Parser a =
@@ -45,25 +47,6 @@ instance Alternative Parser where
         case p s of
           Left _  -> q s
           Right x -> Right x
-
-
-mkParser :: Char -> Parser Char
-mkParser x = Parser $ \case
-    ""     -> Left "end of file"
-    (c:cs) -> if c == x
-              then Right (c, cs)
-              else Left $ "expected: " ++ [x] ++". found: " ++ [c]
-
-
-fail :: String -> Parser a
-fail e = Parser $ \_ -> Left e
-    
-any :: Parser Char
-any = Parser go
-  where
-      go []     = Left "any: end of file"
-      go (x:xs) = Right (x, xs)
-
 
 runParser :: Parser a -> String -> Either String a
 runParser (Parser p) s = fst <$> p s
