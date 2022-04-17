@@ -1,6 +1,9 @@
 module Parsers where
 
+import Control.Applicative
+import Data.Char (isDigit)
 import Text.Printf
+
 
 import TinyMPC
 
@@ -32,3 +35,17 @@ eof = Parser $ \s ->
     if null s
     then Right ((), [])
     else Left "expected eof"
+
+
+digit :: Parser Char
+digit = satisfy isDigit <?> "expected digit"
+
+operator :: Parser Char
+operator = oneOf "+-*/"
+
+expr :: Parser [Char]
+expr = sequence [digit, operator, digit]
+
+spaces :: Parser String
+spaces = many $ oneOf " \n\r"
+
