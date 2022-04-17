@@ -1,5 +1,7 @@
 module Parsers where
 
+import Text.Printf
+
 import TinyMPC
 
 fail :: String -> Parser a
@@ -20,9 +22,13 @@ satisfy f = do
 
 
 char :: Char -> Parser Char
-char c = satisfy (c ==)
+char c = satisfy (c ==) <?> printf "expected: `%c`" c
 
 oneOf :: String -> Parser Char
-oneOf s = satisfy (`elem` s)
+oneOf s = satisfy (`elem` s) <?> printf "expected one of: `%s`" s
 
-
+eof :: Parser ()
+eof = Parser $ \s ->
+    if null s
+    then Right ((), [])
+    else Left "expected eof"

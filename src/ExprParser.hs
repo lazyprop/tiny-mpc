@@ -11,15 +11,26 @@ data Op = Add
         | Div
         deriving (Show, Eq)
 
+
+instance Read Op where
+    readsPrec _ s
+      | s == "+"  = [(Add, "")]
+      | s == "-"  = [(Sub, "")]
+      | s == "*"  = [(Mul, "")]
+      | s == "/"  = [(Div, "")]
+      | otherwise = []
+
+
+charToOp :: Char -> Op
+charToOp c
+  | c == '+'  = Add
+  | c == '-'  = Sub
+  | c == '*'  = Mul
+  | otherwise = Div
+
+
 opParser :: Parser Op
-opParser = do
-    c <- P.any
-    case c of
-      '+' -> return Add
-      '-' -> return Sub
-      '*' -> return Mul
-      '/' -> return Sub
-      _   -> P.fail "not a valid operation"
+opParser = charToOp <$> P.oneOf "+-*/"
 
 
 digParser :: Parser Int

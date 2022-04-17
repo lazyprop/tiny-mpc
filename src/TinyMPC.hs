@@ -51,3 +51,11 @@ instance Alternative Parser where
 runParser :: Parser a -> String -> Either String a
 runParser (Parser p) s = fst <$> p s
 
+(<?>) :: Parser a -> String -> Parser a
+(Parser p) <?> err = Parser $ \s ->
+    case p s of
+      Left  _  -> Left err
+      Right x -> return x
+infixl 2 <?>
+
+
