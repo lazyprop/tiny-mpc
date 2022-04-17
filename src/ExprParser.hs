@@ -2,7 +2,8 @@ module ExprParser where
 
 import Data.Char (isDigit, digitToInt)
 
-import TinyMPC
+import           TinyMPC hiding (any, fail)
+import qualified TinyMPC as Mpc
 
 data Op = Add
         | Sub
@@ -11,18 +12,16 @@ data Op = Add
         deriving (Show, Eq)
 
 opParser :: Parser Op
-opParser = Parser go
-  where
-      go ""     = Left "opParser: end of file"
-      go (c:cs) =
-          case c of
-            '+' -> Right (Add, cs)
-            '-' -> Right (Sub, cs)
-            '*' -> Right (Mul, cs)
-            '/' -> Right (Div, cs)
-            _   -> Left $ "opParser: " ++ [c] ++ " is not a valid operator"
+opParser = do
+    c <- Mpc.any
+    case c of
+      '+' -> return Add
+      '-' -> return Sub
+      '*' -> return Mul
+      '/' -> return Sub
+      _   -> Mpc.fail "not a valid operation"
 
-                           
+
 digParser :: Parser Int
 digParser = Parser go
   where
