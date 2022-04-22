@@ -1,6 +1,7 @@
 module Parsers where
 
 import Control.Applicative
+import Control.Monad
 import Data.Char (isDigit)
 import Text.Printf
 
@@ -43,9 +44,18 @@ digit = satisfy isDigit <?> "expected digit"
 operator :: Parser Char
 operator = oneOf "+-*/"
 
-expr :: Parser [Char]
-expr = sequence [digit, operator, digit]
-
 spaces :: Parser String
 spaces = many $ oneOf " \n\r"
+
+spaceSurrounded :: Parser a -> Parser a
+spaceSurrounded p = spaces *> p <* spaces
+
+ignoreSpaces :: [Parser a] -> Parser [a]
+ignoreSpaces = mapM spaceSurrounded
+
+expr :: Parser String
+expr = concat <$> sequence [ ignoreSpaces [digit]
+                           , concat <$> some (ignoreSpaces [operator, digit])
+                           ]
+
 

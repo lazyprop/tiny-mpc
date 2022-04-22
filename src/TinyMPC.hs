@@ -1,4 +1,6 @@
-{-# Language LambdaCase #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+
 
 module TinyMPC  where
 
@@ -51,11 +53,22 @@ instance Alternative Parser where
 runParser :: Parser a -> String -> Either String a
 runParser (Parser p) s = fst <$> p s
 
+-- replaces the error of a parser with a given string
 (<?>) :: Parser a -> String -> Parser a
 (Parser p) <?> err = Parser $ \s ->
     case p s of
-      Left  _  -> Left err
+      Left  _ -> Left err
       Right x -> return x
 infixl 2 <?>
 
+-- combines two parsers in given order returning a list
+(<:>) :: Parser a -> Parser [a] -> Parser [a]
+p <:> qs = do
+    res1 <- p
+    res2 <- qs
+    return (res1 : res2)
+infixr 7 <:>
 
+(<:$>) :: Parser a -> Parser a -> Parser [a]
+p <:$> q = p <:> sequence [q]
+infixr 7 <:$>
