@@ -72,3 +72,10 @@ infixr 7 <:>
 (<:$>) :: Parser a -> Parser a -> Parser [a]
 p <:$> q = p <:> sequence [q]
 infixr 7 <:$>
+
+
+(<++>) :: Parser [a] -> Parser [a] -> Parser [a]
+ps <++> qs = do
+    res1 <- ps
+    res2 <- qs
+    return $ res1 ++ res2
