@@ -20,7 +20,6 @@ instance Read Op where
       | s == "/"  = [(Div, "")]
       | otherwise = []
 
-
 charToOp :: Char -> Op
 charToOp c
   | c == '+'  = Add
@@ -32,10 +31,8 @@ charToOp c
 opParser :: Parser Op
 opParser = charToOp <$> P.oneOf "+-*/"
 
-
 digParser :: Parser Int
 digParser = digitToInt <$> P.satisfy isDigit
-
 
 type Expr = (Int, Op, Int)
 
